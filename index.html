@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center mb-4">News Search</h1>
+                <div class="input-group mb-3">
+                    <input type="text" id="details" class="form-control" placeholder="Search news">
+                    <button class="btn btn-dark" onclick="search()">Search</button>
+                </div>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function search() {
+            const news = document.getElementById('details').value;
+            fetch(`https://newsapi.org/v2/everything?q=${news}&from=2024-02-12&sortBy=publishedAt&apiKey=80aeaee8ea094cfc9c4f4dfb7d1fe7e1`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => displayData(data))
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('result').innerHTML = "<p>Error fetching data. Please try again later.</p>";
+                });
+        }
+
+        function displayData(data) {
+            let htmlData = '';
+            if (data.articles && data.articles.length > 0) {
+                const articles = data.articles.slice(0, 5);
+                articles.forEach(article => {
+                    htmlData += `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">${article.title}</h5>
+                                <p class="card-text">${article.description}</p>
+                                <p class="card-text">${article.source.name}</p>
+                            </div>
+                        </div>`;
+                });
+            } else {
+                htmlData = "<p>No news found.</p>";
+            }
+            document.getElementById('result').innerHTML = htmlData;
+        }
+    </script>
+</body>
+
+</html>
